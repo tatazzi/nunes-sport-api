@@ -1,36 +1,44 @@
 package com.application.api.service;
 
 import com.application.api.dtos.EditProductDto;
+import com.application.api.dtos.PaginatedProductDto;
 import com.application.api.model.Product;
 import com.application.api.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.ErrorResponseException;
-
-import java.util.List;
 
 @Service
 public class ProductService {
     @Autowired
     ProductRepository productRepository;
 
+    public PaginatedProductDto getProducts(int page) {
+        int pageSize = 5;
+        PageRequest pageRequest = PageRequest.of(page, pageSize);
+        Page<Product> productPage = productRepository.findAll(pageRequest);
 
-    public List<Product> getProducts() {
-        return productRepository.findAll();
+        PaginatedProductDto response = new PaginatedProductDto();
+        response.setProducts(productPage.getContent());
+        response.setCurrentPage(productPage.getNumber());
+        response.setTotalItems((int) productPage.getTotalElements());
+        response.setTotalPages(productPage.getTotalPages());
+
+        return response;
     }
 
     public void createProduct(Product product) {
 
-            try {
-                if(productRepository.findByCode(product.getCode())!=null){
-                throw new Exception("Codigo do produto ja registrado");
-                } productRepository.save(product);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        try {
+            if (productRepository.findByCode(product.getCode()) != null) {
+                throw new Exception("Codigo do produce ja registrado");
             }
+            productRepository.save(product);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+    }
 
 
     public Product editProduct(String code, EditProductDto productDto) {

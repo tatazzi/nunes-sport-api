@@ -1,15 +1,13 @@
 package com.application.api.controller;
 
 import com.application.api.dtos.EditProductDto;
+import com.application.api.dtos.PaginatedProductDto;
 import com.application.api.dtos.RegisterProductDto;
 import com.application.api.model.Product;
 import com.application.api.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 public class ProductController {
@@ -18,8 +16,8 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping("/products")
-    public List<Product> getProducts() {
-        return productService.getProducts();
+    public PaginatedProductDto getProducts(@RequestParam(value = "page", defaultValue = "0") int page) {
+        return productService.getProducts(page);
     }
 
     @PostMapping("/registerProduct")
